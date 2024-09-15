@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { MINIMUM_HEIGHT, MINIMUM_WIDTH } from "./constants";
 import SmallScreenWarning from "./components/SmallScreenWarning";
 import { PlayerProvider } from "./context/PlayerContext";
-import GameScreen from "./components/GameScreen";
+import Game from "./pages/Game";
 
 export default function App() {
   const [windowSize, setWindowSize] = useState({
@@ -35,7 +35,7 @@ export default function App() {
       <div className="relative">
         {isScreenBigEnough ? (
           <PlayerProvider>
-            <GameScreen />
+            <Game />
           </PlayerProvider>
         ) : (
           <SmallScreenWarning />
