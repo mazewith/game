@@ -45,6 +45,9 @@ export default function GameScreen() {
         }
         player.position = newPosition;
         player.progress.steps += 1;
+        if (mazeInstance.isExit(newPosition)) {
+          player.progress.completed = true;
+        }
         updatePlayerPosition(player.id, player.position, player.progress);
       }
     };

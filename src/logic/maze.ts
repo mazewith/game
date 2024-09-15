@@ -51,6 +51,12 @@ export default class Maze {
     return cell.walls[direction] === WallState.Open;
   }
 
+  public isExit(position: Position): boolean {
+    const { row, col } = position;
+    const { rows, columns } = this.size;
+    return row === rows - 1 && col === columns - 1;
+  }
+
   // Check if the position is within maze bounds
   private isInBounds(row: number, col: number): boolean {
     const { rows, columns } = this.size;
