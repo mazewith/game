@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import { PlayersMap, Position, Progress, CreatePlayerDto } from "@/interfaces";
+import { incrementJoin } from "@/services/redis/queries/joins";
 
 type AddPlayer = (player: CreatePlayerDto) => void;
 
@@ -48,6 +49,7 @@ export const PlayerProvider = ({
         },
       };
     });
+    incrementJoin(newPlayer.roomId, newPlayer.id);
   }, []);
 
   const updatePlayerPosition: UpdatePlayerPosition = useCallback(

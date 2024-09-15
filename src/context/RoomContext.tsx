@@ -1,9 +1,16 @@
 import { ROOM_ID } from "@/constants";
 import { useSearchParams } from "@/hooks/useSearchParams";
-import { RoomConfig } from "@/interfaces";
-import { createContext, useContext, useMemo, ReactNode } from "react";
+import { Room } from "@/interfaces";
+import { createRoom, getRoom } from "@/services/redis/queries/rooms";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
 
-const RoomContext = createContext<RoomConfig | undefined>(undefined);
+const RoomContext = createContext<Room | undefined>(undefined);
 
 export const useRoomContext = () => {
   const context = useContext(RoomContext);
@@ -20,15 +27,42 @@ interface RoomProviderProps {
 
 export const RoomProvider = ({ children }: RoomProviderProps) => {
   const searchParams = useSearchParams();
+  const [room, setRoom] = useState<Room | null>(null);
 
-  const roomConfig = useMemo(
-    () => ({
-      id: searchParams.roomId || ROOM_ID,
-    }),
-    [searchParams]
-  );
+  useEffect(() => {
+    const fetchOrCreateRoom = async () => {
+      let currentRoom: Room;
 
-  return (
-    <RoomContext.Provider value={roomConfig}>{children}</RoomContext.Provider>
-  );
+      if (searchParams.roomId) {
+        const result = await getRoom(searchParams.roomId);
+        if (result) {
+          currentRoom = result;
+        } else {
+          currentRoom = {
+            id: searchParams.roomId,
+            createdAt: new Date(),
+            joins: 0,
+            completes: 0,
+          };
+          await createRoom(currentRoom);
+        }
+      } else {
+        currentRoom = {
+          id: ROOM_ID,
+          createdAt: new Date(),
+          joins: 0,
+          completes: 0,
+        };
+        await createRoom(currentRoom);
+      }
+      setRoom(currentRoom);
+    };
+    fetchOrCreateRoom();
+  }, [searchParams]);
+
+  if (!room) {
+    return <div>Loading...</div>;
+  }
+
+  return <RoomContext.Provider value={room}>{children}</RoomContext.Provider>;
 };
