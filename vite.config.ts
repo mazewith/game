@@ -1,8 +1,23 @@
+import { vitePlugin as remix } from "@remix-run/dev";
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
 import tsconfigPaths from "vite-tsconfig-paths";
+import { copyFileSync } from "node:fs";
+import { join } from "node:path";
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), tsconfigPaths()],
+  plugins: [
+    remix({
+      ssr: false,
+      buildEnd(args) {
+        if (!args.viteConfig.isProduction) return;
+
+        const buildPath = args.viteConfig.build.outDir;
+        copyFileSync(
+          join(buildPath, "index.html"),
+          join(buildPath, "404.html")
+        );
+      },
+    }),
+    tsconfigPaths(),
+  ],
 });
