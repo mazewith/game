@@ -4,13 +4,14 @@ import MazeView from "@/components/Maze";
 import { usePlayerContext } from "@/context/PlayerContext";
 import { useEffect, useState, useRef } from "react";
 import FirebaseService from "@/services/FirebaseService";
-import { ROOM_ID } from "@/constants";
 import { ControlSchema, Direction, Position } from "@/interfaces";
 import Maze from "@/logic/maze";
+import { useRoomContext } from "@/context/RoomContext";
 
 export default function GameScreen() {
   const { players, updatePlayerPosition, addPlayer } = usePlayerContext();
-  const [mazeInstance] = useState(Maze.getInstance());
+  const { id: roomId } = useRoomContext();
+  const [mazeInstance] = useState(Maze.getInstance({ roomId }));
 
   // Using useRef to hold the latest players value without causing re-renders
   const playersRef = useRef(players);
@@ -20,7 +21,7 @@ export default function GameScreen() {
   }, [players]);
 
   useEffect(() => {
-    const dataService = new FirebaseService(ROOM_ID);
+    const dataService = new FirebaseService(roomId);
 
     const move = (controlSchema: ControlSchema) => {
       const player = playersRef.current[controlSchema.playerId];

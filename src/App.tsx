@@ -4,6 +4,7 @@ import { MINIMUM_HEIGHT, MINIMUM_WIDTH } from "./constants";
 import SmallScreenWarning from "./components/SmallScreenWarning";
 import { PlayerProvider } from "./context/PlayerContext";
 import Game from "./pages/Game";
+import { RoomProvider } from "./context/RoomContext";
 
 export default function App() {
   const [windowSize, setWindowSize] = useState({
@@ -34,9 +35,11 @@ export default function App() {
       />
       <div className="relative">
         {isScreenBigEnough ? (
-          <PlayerProvider>
-            <Game />
-          </PlayerProvider>
+          <RoomProvider>
+            <PlayerProvider>
+              <Game />
+            </PlayerProvider>
+          </RoomProvider>
         ) : (
           <SmallScreenWarning />
         )}

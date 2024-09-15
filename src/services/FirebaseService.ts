@@ -34,7 +34,6 @@ export default class FirebaseService extends DataService {
 
   // Connect listeners to Firebase Realtime Database
   connect(): void {
-    console.log("Connecting to Firebase");
     this.connectListener = onValue(this.playersRef, (snapshot) => {
       const data: PlayerSchema = snapshot.val();
       if (data) {

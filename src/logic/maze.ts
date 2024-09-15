@@ -19,11 +19,17 @@ export default class Maze {
     this.maze = this.generateMaze();
   }
 
-  public static getInstance(
-    size: MazeSize = { rows: ROWS, columns: COLUMNS },
-    seed?: number
-  ): Maze {
+  public static getInstance({
+    size = { rows: ROWS, columns: COLUMNS },
+    roomId,
+  }: {
+    size?: MazeSize;
+    roomId?: string;
+  }): Maze {
     if (!Maze.instance) {
+      const seed = roomId
+        ? roomId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
+        : undefined;
       Maze.instance = new Maze(size, seed);
     }
     return Maze.instance;
