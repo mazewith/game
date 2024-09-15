@@ -1,12 +1,24 @@
+import type { MetaFunction } from "@remix-run/node";
 import BackgroundImage from "@assets/Background_2.jpg";
 import { useEffect, useState } from "react";
-import { MINIMUM_HEIGHT, MINIMUM_WIDTH } from "./constants";
-import SmallScreenWarning from "./components/SmallScreenWarning";
-import { PlayerProvider } from "./context/PlayerContext";
-import Game from "./pages/Game";
-import { RoomProvider } from "./context/RoomContext";
+import { MINIMUM_HEIGHT, MINIMUM_WIDTH } from "@/constants";
+import SmallScreenWarning from "@/components/SmallScreenWarning";
+import { PlayerProvider } from "@/context/PlayerContext";
+import Game from "@/pages/Game";
+import { RoomProvider } from "@/context/RoomContext";
 
-export default function App() {
+export const meta: MetaFunction = () => {
+  return [
+    { title: "MazeWith - Multiplayer Maze Game" },
+    {
+      name: "description",
+      content:
+        "MazeWith is a multiplayer maze game that you can play with friends.",
+    },
+  ];
+};
+
+export default function Index() {
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
