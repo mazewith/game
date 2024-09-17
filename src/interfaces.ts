@@ -69,6 +69,9 @@ export interface MazeSize {
   columns: number;
 }
 
-export interface RoomConfig {
+export interface Room {
   id: string;
+  createdAt: number;
+  joins: number;
+  completes: number;
 }

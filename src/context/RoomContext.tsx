@@ -1,9 +1,16 @@
 import { ROOM_ID } from "@/constants";
 import { useSearchParams } from "@/hooks/useSearchParams";
-import { RoomConfig } from "@/interfaces";
-import { createContext, useContext, useMemo, ReactNode } from "react";
+import { Room } from "@/interfaces";
+import { Redis } from "@/services/Redis";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
 
-const RoomContext = createContext<RoomConfig | undefined>(undefined);
+const RoomContext = createContext<Room | undefined>(undefined);
 
 export const useRoomContext = () => {
   const context = useContext(RoomContext);
@@ -13,22 +20,42 @@ export const useRoomContext = () => {
   return context;
 };
 
-// Define RoomProvider Props type
 interface RoomProviderProps {
   children: ReactNode;
 }
 
+// Utility function to create a default room object
+const createDefaultRoom = (roomId: string): Room => ({
+  id: roomId,
+  createdAt: Date.now(),
+  joins: 0,
+  completes: 0,
+});
+
 export const RoomProvider = ({ children }: RoomProviderProps) => {
   const searchParams = useSearchParams();
+  const [room, setRoom] = useState<Room | null>(null);
 
-  const roomConfig = useMemo(
-    () => ({
-      id: searchParams.roomId || ROOM_ID,
-    }),
-    [searchParams]
-  );
+  useEffect(() => {
+    const fetchOrCreateRoom = async () => {
+      const roomId = searchParams.roomId || ROOM_ID;
+      const existingRoom = await Redis.getRoom(roomId);
 
-  return (
-    <RoomContext.Provider value={roomConfig}>{children}</RoomContext.Provider>
-  );
+      const currentRoom = existingRoom || createDefaultRoom(roomId);
+
+      if (!existingRoom) {
+        await Redis.createRoom(currentRoom);
+      }
+
+      setRoom(currentRoom);
+    };
+
+    fetchOrCreateRoom();
+  }, [searchParams]);
+
+  if (!room) {
+    return <div>Loading...</div>;
+  }
+
+  return <RoomContext.Provider value={room}>{children}</RoomContext.Provider>;
 };
